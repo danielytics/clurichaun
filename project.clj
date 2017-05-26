@@ -5,7 +5,12 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.542"]
-                 [cljsjs/pixi "4.4.3-0"]]
+                 [org.clojure/core.async "0.3.442"]
+                 [bardo "0.1.2-SNAPSHOT"]
+                 [cljsjs/pixi "4.4.3-0"]
+                 [cljsjs/pixi-sound "1.4.1-0"]
+                 [cljsjs/nprogress "0.2.0-1"]
+                 [cljsjs/localforage "1.3.1-0"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]]
 
@@ -29,8 +34,8 @@
   {:builds
    [{:id           "dev"
      :source-paths ["src"]
-     :figwheel     {:on-jsload            "clurichaun.core/load"}
-     :compiler     {:main                 clurichaun.core
+     :figwheel     {:on-jsload            "clurichaun.core/reload"}
+     :compiler     {:main                 example.core
                     :output-to            "resources/public/js/compiled/app.js"
                     :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
@@ -40,7 +45,7 @@
 
     {:id           "min"
      :source-paths ["src"]
-     :compiler     {:main            clurichaun.core
+     :compiler     {:main            example.core
                     :output-to       "resources/public/js/compiled/app.js"
                     :optimizations   :advanced
                     :closure-defines {goog.DEBUG false}

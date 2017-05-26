@@ -1,4 +1,4 @@
-(ns pixi-talk.helpers)
+(ns clurichaun.helpers)
 
 #?(:clj (defmacro <- [field value]
          `(let [v# ~value]
