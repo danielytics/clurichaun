@@ -10,6 +10,14 @@
 (when debug?
   (enable-console-print!))
 
+
+(def PI 3.14159265)
+(def PI2 6.2831853)
+(defn rotation->radians
+  "Converts an angle in the range 0->1 (0 degrees to 360 degrees) to radians"
+  [rotation]
+  (* PI2 rotation))
+
 (defonce loaded-resources (atom #{}))
 (defonce pixi (atom nil))
 
@@ -84,7 +92,7 @@
   "Determines which keys have changed and returns a map of only those kv pairs"
   [old-map new-map]
   (->> new-map
-       (map (fn [old [k v]] (when (not= v (get old k)) [k v])))
+       (map (fn [[k v]] (when (not= v (get old-map k)) [k v])))
        (filter identity)
        (into {})))
 
@@ -125,7 +133,10 @@
                 (merge
                   old-world
                   (condp = command
-                    :advance        (advance-fsm world value)
+                    :advance        (let [new-world (advance-fsm world value)
+                                          sprites   (select-changed (:sprites world) (:sprites new-world))]
+                                      (swap! pixi update ::sprites make-sprites)
+                                      new-world)
                     :update-world   (merge world (select-changed conf @global-config))
                     :run-timers     (reduce (fn [world timer] (timer world)) (dissoc world :screen-enter-map :screen-leave-map) value)
                     world))))))))))
@@ -172,6 +183,17 @@
       (set! (.-x sprite) (if (< (.-x sprite) 850) (+ 25 (.-x sprite)) -50)))
     (.render renderer stage)))
 
+
+(defn destroy-world
+  "Destroy and cleanup the world state"
+  [world]
+  world)
+
+(defn create-world
+  "Create and initialise the world state"
+  [world]
+  world)
+
 ; Define the global screen state chart
 (defonce screen-state-chart
   {[nil :init]        {:init :intro}
@@ -199,7 +221,9 @@
   (println "Advancing state from" current-screen "to" next-screen)
   (-> world
       ((get (:screen-leave-map state) current-screen ignore) next-screen)
+      destroy-world
       ((get (:screen-enter-map state) next-screen ignore) current-screen)
+      create-world
       (assoc :current next-screen :prev current-screen)
       (->> (merge state)))))
 
@@ -211,8 +235,6 @@
        prev-screen    (:prev state)
        transitions    (get screen-state-chart [prev-screen current-screen])]
   (set (keys transitions))))
-
-
 
 
 
