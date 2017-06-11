@@ -33,9 +33,9 @@
   :cljsbuild
   {:builds
    [{:id           "dev"
-     :source-paths ["src"]
+     :source-paths ["src/framework/common" "src/framework/core" "src/example"]
      :figwheel     {:on-jsload            "clurichaun.core/reload"}
-     :compiler     {:main                 example.core
+     :compiler     {:main                 clurichaun.init
                     :output-to            "resources/public/js/compiled/app.js"
                     :output-dir           "resources/public/js/compiled/out"
                     :asset-path           "js/compiled/out"
@@ -43,9 +43,19 @@
                     :preloads             [devtools.preload]
                     :external-config      {:devtools/config {:features-to-install :all}}}}
 
+    {:id            "dev-worker"
+     :source-paths ["src/framework/common" "src/framework/worker" "src/example"]
+     :figwheel     true
+     :compiler     {:output-to            "resources/public/js/compiled/worker.js"
+                    :output-dir           "resources/public/js/compiled/out_worker"
+                    :source-map-timestamp true
+                    :optimizations        :none
+                    :preloads             [devtools.preload]
+                    :external-config      {:devtools/config {:features-to-install :all}}}}
+
     {:id           "min"
      :source-paths ["src"]
-     :compiler     {:main            example.core
+     :compiler     {:main            clurichaun.init
                     :output-to       "resources/public/js/compiled/app.js"
                     :optimizations   :advanced
                     :closure-defines {goog.DEBUG false}
